@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import numpy as np
 import pandas as pd
@@ -48,11 +49,11 @@ def prompt(strgpu, data_path, batch_size,
             data = data.to(device)
             pro = pd.DataFrame(ESMenzyme(data)[0].cpu().detach().numpy(), columns=range(1280))
             prompt = pd.concat([prompt,pro])
-        prompt.to_csv("data/enzyme_prompt_first.txt", sep='\t', header=False, index=False)
+        prompt.to_csv(f"{sys.path[0]}/data/enzyme_prompt_first.txt", sep='\t', header=False, index=False)
 def main():
     """Main program running!"""
     strgpu, batch_size = argument()
-    prompt(strgpu=strgpu, data_path='data/enzyme_token.txt', batch_size=batch_size, 
-                param_path='model_param/first/ft3_MLP_BN_save.pt', seed=2024)
+    prompt(strgpu=strgpu, data_path=f'{sys.path[0]}/data/enzyme_token.txt', batch_size=batch_size, 
+                param_path=f'{sys.path[0]}/model_param/first/ft3_MLP_BN_save.pt', seed=2024)
 if __name__ == '__main__':
     main()

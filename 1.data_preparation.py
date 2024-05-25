@@ -1,4 +1,5 @@
 import os
+import sys
 import esm
 import argparse
 import pandas as pd
@@ -24,11 +25,11 @@ def format_transfer(fasta_path):
     for record in records:
         record_id.append(record.id)
         data.append((record.id, record.seq))
-    os.makedirs('./data', exist_ok = True)
-    with open('./data/accession.txt', 'w') as fw:
+    os.makedirs(f'{sys.path[0]}/data', exist_ok = True)  
+    with open(f'{sys.path[0]}/data/accession.txt', 'w') as fw:
         for i, _ in data:
             fw.write(str(i) + '\n')
-    with open('./data/raw_data.txt', 'w') as fw:
+    with open(f'{sys.path[0]}/data/raw_data.txt', 'w') as fw:
         for i, s in data:
             fw.write(str(i) + '\n')
             fw.write(str(s) + '\n')
@@ -39,7 +40,7 @@ def token(data):
     alphabet = esm.pretrained.esm2_t33_650M_UR50D()[1]
     batch_converter = alphabet.get_batch_converter()
     batch_tokens = pd.DataFrame(batch_converter(data)[2]).iloc[:, :1024]
-    batch_tokens.to_csv(f"data/token.txt", sep='\t', header=False, index=False)
+    batch_tokens.to_csv(f"{sys.path[0]}/data/token.txt", sep='\t', header=False, index=False)
     return batch_tokens
 
 def main():

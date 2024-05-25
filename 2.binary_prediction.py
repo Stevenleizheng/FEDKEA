@@ -1,4 +1,5 @@
 import os
+import sys
 import numpy as np
 import pandas as pd
 import torch
@@ -56,33 +57,33 @@ def prediction(strgpu, data_path, batch_size,
             all_max = np.concatenate((all_max, (pred[:, 1]>threshold).astype(bool)))
         string_list = ['True' if item else 'False' for item in all_max]
     # write into the specified file
-    os.makedirs('result/', exist_ok = True)
+    os.makedirs(f'{sys.path[0]}/result/', exist_ok = True)
     accession = []
-    with open('data/accession.txt', 'r') as f:
+    with open(f'{sys.path[0]}/data/accession.txt', 'r') as f:
         while 1:
             a = f.readline().strip()
             if not a:
                 break
             accession.append(a)
-    with open('result/binary_result.txt', 'w') as fw:
+    with open(f'{sys.path[0]}/result/binary_result.txt', 'w') as fw:
         fw.write('Accession\tIsEnzyme\tProbability\n')
         for a, i, p in zip(accession, string_list, all_prob):
             fw.write(f'{a}\t{i}\t{p}\n')
     # acquire the enzyme token
-    token = pd.read_table('data/token.txt', header=None)
+    token = pd.read_table(f'{sys.path[0]}/data/token.txt', header=None)
     enzyme_token = token[all_max]
-    enzyme_token.to_csv("data/enzyme_token.txt", sep='\t', header=False, index=False)
-    accession = pd.read_table('result/binary_result.txt')
+    enzyme_token.to_csv(f"{sys.path[0]}/data/enzyme_token.txt", sep='\t', header=False, index=False)
+    accession = pd.read_table(f'{sys.path[0]}/result/binary_result.txt')
     enzyme_accession = list(accession[all_max]['Accession'])
-    with open('data/enzyme_accession.txt','w') as fw:
+    with open(f'{sys.path[0]}/data/enzyme_accession.txt','w') as fw:
         for i in enzyme_accession:
             fw.write(str(i)+'\n')
 
 def main():
     """Main program running!"""
     strgpu, batch_size, threshold = argument()
-    prediction(strgpu=strgpu, data_path='data/token.txt', batch_size=batch_size, 
-                param_path='model_param/binary/esm650_ft4layers.pt', threshold=threshold, seed=2024)
+    prediction(strgpu=strgpu, data_path=f'{sys.path[0]}/data/token.txt', batch_size=batch_size, 
+                param_path=f'{sys.path[0]}/model_param/binary/esm650_ft4layers.pt', threshold=threshold, seed=2024)
 if __name__ == '__main__':
     main()
 
