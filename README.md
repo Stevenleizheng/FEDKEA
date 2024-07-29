@@ -54,9 +54,9 @@ wget -c https://zenodo.org/records/13119729/files/model_param.tar.gz
 tar xzvf model_param.tar.gz
 
 (Optional) Step 3: test the software
-Run this command (a test prediction with 20 proteins) to see whether the software has installed correctly.
+Run this command (a test prediction with 415 proteins) to see whether the software has installed correctly.
 
-python predict.py test.fa -o result/
+python main.py -i uniprot_2024.fasta -o result/
 
 If the software is installed correctly and completely, this step will finish in less than 10 minutes (might be longer if your device is too old) without any error. The results of the test prediction will be saved in the result folder.
 
@@ -71,28 +71,30 @@ If you want to use GPU(s), please prepare the IDs of the GPU(s) you want to use,
 
 (2) Prediction
 
-CPU: python predict.py ???.fa -o ???/
+CPU: python main.py -i ???.fa -o ???/
 
-single GPU machine: python predict.py ???.fa -g 0 -o ???/
+single GPU machine: python main.py -i ???.fa -g '0' -o ???/
 
-multi GPU machine, using one GPU: python predict.py ???.fa -g x -o ???/
+multi GPU machine, using one GPU: python main.py -i ???.fa -g 'x' -o ???/
 
-multi GPU machine, using multi GPUs: python predict.py ???.fa -g x1,x2,... -o ???/
+multi GPU machine, using multi GPUs: python main.py -i ???.fa -g 'x1,x2,...' -o ???/
 
 -o determines the output directory, -g determines the IDs of GPUs you want to use (not given -g, will use CPU)
 
-If you want to change the batch size (default is 2), please use -b, please note that the batch size cannot be negative and should not be smaller than the number of GPUs used.
+If you want to change the batch size (default is 32), please use -b, please note that the batch size cannot be negative and should not be smaller than the number of GPUs used.
+
+If you want to change the threshold of binary task (default is 0.5), please use -t. You can set the number between 0 and 1.
 
 Example commands:
 
-Predict proteins in 'example.fasta', save the results to 'result/', and batch size is 16.
+Predict proteins in 'example.fasta', save the results to 'result/', and batch size is 64.
 
-CPU: python predict.py example.fa -o result/ -b 16
+CPU: python main.py -i example.fa  -b 64 -o result/
 
-single GPU machine: python predict.py example.fa -o result/ -g 0 -b 16
+single GPU machine: python main.py -i example.fa -g '0' -b 64 -o result/ 
 
-multi GPU machine, using one GPU (ID:2): python predict.py example.fa -o result/ -g 2 -b 16
+multi GPU machine, using one GPU (ID:2): python main.py -i example.fa -g '2' -b 64 -o result/ 
 
-multi GPU machine, using eight GPUs (ID:0-7): python predict.py example.fa -o result/ -g 0,1,2,3,4,5,6,7 -b 16
+multi GPU machine, using eight GPUs (ID:0-7): python main.py -i example.fa -g '0,1,2,3,4,5,6,7' -b 16 -o result/ 
 
-The descriptions for the result files are in the 'discription.txt' file of the output directory.
+The descriptions for the result files are in the 'binary_result.txt' and 'enzyme_result.csv' files of the output directory.
