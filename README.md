@@ -12,19 +12,19 @@ Two levels of annotation:
 ### Step 1: prepare the environment
 (1) Download the FEDKEA software from github
 
-  git clone https://github.com/Stevenleizheng/FEDKEA.git
+``git clone https://github.com/Stevenleizheng/FEDKEA.git``
 
 (2) Go to the directory of FEDKEA
 
-  cd FEDKEA (for example)
+cd FEDKEA (for example)
 
 (3) Create a new conda environment
 
-  conda create -n fedkea python=3.9
+conda create -n fedkea python=3.9
 
 (4) Enter the conda environment
 
-  conda activate fedkea
+conda activate fedkea
 
 (5) Install the following software
 
