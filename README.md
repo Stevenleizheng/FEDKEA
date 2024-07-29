@@ -14,7 +14,7 @@ Two levels of annotation:
 
 git clone https://github.com/Stevenleizheng/FEDKEA.git
 
-(2) Go to the directory of PhaProtFunc-ESM
+(2) Go to the directory of FEDKEA
 
 cd FEDKEA (for example)
 
@@ -45,16 +45,13 @@ e. numpy: conda install numpy or pip install numpy
 f. scikit-learn: conda install -c conda-forge scikit-learn or pip install scikit-learn
 
 ### Step 2: download the trained model
-(1) Download the model (The working path is still 'FEDKEA')
+(1) Download the model (The working path is still 'FEDKEA'). The file size is 5.2 GB.
 
-wget -c https://zenodo.org/records/12797951/files/model.tar.gz
+wget -c https://zenodo.org/records/13119729/files/model_param.tar.gz
 
 (2) Unpack the file
 
-tar xzvf model.tar.gz
-
-
-
+tar xzvf model_param.tar.gz
 
 (Optional) Step 3: test the software
 Run this command (a test prediction with 20 proteins) to see whether the software has installed correctly.
