@@ -13,17 +13,14 @@ Two levels of annotation:
 (2) Go to the directory of FEDKEA
 (2) Go to the directory of FEDKEA, for example:
 
-cd FEDKEA (for example)
 ``cd FEDKEA`` 
 
 (3) Create a new conda environment
 
-conda create -n fedkea python=3.9
 ``conda create -n fedkea python=3.9``
 
 (4) Enter the conda environment
 
-conda activate fedkea
 ``conda activate fedkea``
 
 (5) Install the following software
@@ -33,36 +30,28 @@ If you want to use the CPU version, please run conda install pytorch torchvision
 
 If you want to use the GPU version, please go to https://pytorch.org/get-started and get the conda or pip install command according to your device and demand.
 
-b. fair-esm: pip install fair-esm
 b. fair-esm: ``pip install fair-esm``
 
-c. pandas: conda install pandas
 c. pandas: ``conda install pandas``
 
-d. biopython: conda install -c bioconda biopython
 d. biopython: ``conda install -c bioconda biopython``
 
-e. numpy: conda install numpy or pip install numpy
 e. numpy: ``conda install numpy`` or ``pip install numpy``
 
-f. scikit-learn: conda install -c conda-forge scikit-learn or pip install scikit-learn
 f. scikit-learn: ``conda install -c conda-forge scikit-learn`` or ``pip install scikit-learn``
 
 ### Step 2: download the trained model
 (1) Download the model (The working path is still 'FEDKEA'). The file size is 5.2 GB.
 
-wget -c https://zenodo.org/records/13119729/files/model_param.tar.gz
 ``wget -c https://zenodo.org/records/13119729/files/model_param.tar.gz``
 
 (2) Unpack the file
 
-tar xzvf model_param.tar.gz
 ``tar xzvf model_param.tar.gz``
 
 (Optional) Step 3: test the software
 Run this command (a test prediction with 415 proteins) to see whether the software has installed correctly.
 
-python main.py -i uniprot_2024.fasta -o result/
 ``python main.py -i uniprot_2024.fasta -o result/``
 
 If the software is installed correctly and completely, this step will finish in less than 10 minutes (might be longer if your device is too old) without any error. The results of the test prediction will be saved in the result folder.
@@ -75,16 +64,12 @@ If you want to use GPU(s), please prepare the IDs of the GPU(s) you want to use,
 
 (2) Prediction
 
-CPU: python main.py -i ???.fa -o ???/
 CPU: ``python main.py -i ???.fa -o ???/``
 
-single GPU machine: python main.py -i ???.fa -g '0' -o ???/
 single GPU machine: ``python main.py -i ???.fa -g '0' -o ???/``
 
-multi GPU machine, using one GPU: python main.py -i ???.fa -g 'x' -o ???/
 multi GPU machine, using one GPU: ``python main.py -i ???.fa -g 'x' -o ???/``
 
-multi GPU machine, using multi GPUs: python main.py -i ???.fa -g 'x1,x2,...' -o ???/
 multi GPU machine, using multi GPUs: ``python main.py -i ???.fa -g 'x1,x2,...' -o ???/``
 
 -o determines the output directory, -g determines the IDs of GPUs you want to use (not given -g, will use CPU)
@@ -95,16 +80,12 @@ Example commands:
 
 Predict proteins in 'example.fasta', save the results to 'result/', and batch size is 64.
 
-CPU: python main.py -i example.fa  -b 64 -o result/
 CPU: ``python main.py -i example.fa  -b 64 -o result/``
 
-single GPU machine: python main.py -i example.fa -g '0' -b 64 -o result/ 
 single GPU machine: ``python main.py -i example.fa -g '0' -b 64 -o result/``
 
-multi GPU machine, using one GPU (ID:2): python main.py -i example.fa -g '2' -b 64 -o result/ 
 multi GPU machine, using one GPU (ID:2): ``python main.py -i example.fa -g '2' -b 64 -o result/`` 
-
-multi GPU machine, using eight GPUs (ID:0-7): python main.py -i example.fa -g '0,1,2,3,4,5,6,7' -b 16 -o result/ 
+ 
 multi GPU machine, using eight GPUs (ID:0-7): ``python main.py -i example.fa -g '0,1,2,3,4,5,6,7' -b 16 -o result/`` 
 
 The descriptions for the result files are in the 'binary_result.txt' and 'enzyme_result.csv' files of the output directory.
