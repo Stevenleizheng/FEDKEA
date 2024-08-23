@@ -13,23 +13,26 @@ from sklearn.neighbors import KNeighborsClassifier
 from model import EnzymeGeneral
 from utilis import EnzymeData, EnzData, set_cuda
 
-
 def argument():
     parser = argparse.ArgumentParser(description='Enzyme commission prediction')
-    parser.add_argument('-g', '--gpu', type=str, help="the number of GPU,(eg. '1')")
-    parser.add_argument('-b', '--batch_size', type=int, help='batch size,(eg. 32)')
+    parser.add_argument('-g', '--gpu', type=str, default='None', help="the number of GPU,(eg. '1')")
+    parser.add_argument('-b', '--batch_size', type=int, default=32, help='batch size,(eg. 32)')
+    parser.add_argument('-d', '--data_path', type=str, default=os.path.join(os.getcwd(), 'data/'), help='data file path')
+    parser.add_argument('-o', '--output', type=str, default=os.path.join(os.getcwd(), 'result/'), help='output,(eg. result)')
     args = parser.parse_args()
     strgpu = args.gpu
     batch_size = args.batch_size
-    return strgpu, batch_size
+    data_path = args.data_path
+    output = args.output
+    return strgpu, batch_size, data_path, output
 
-def first_prediction(strgpu, batch_size, seed, 
+def first_prediction(strgpu, batch_size, seed, output,
                      data_path, param_path):
     """First prediction"""
     # Device
     device = set_cuda(strgpu, seed)
     # Dataloader
-    dataset = EnzymeData(data_path)
+    dataset = EnzymeData(os.path.join(data_path, "enzyme_prompt_first.pt"))
     dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=False)
     # Model
     ESMenzyme = EnzymeGeneral(n_class=7).to(device)
@@ -65,8 +68,8 @@ def first_prediction(strgpu, batch_size, seed,
             all_prob = np.concatenate((all_prob, np.max(pred, axis=1)))
             all_max = np.concatenate((all_max, np.argmax(pred, axis=1)+1)).astype(int)
     # Result
-    enzyme_accession = []
-    with open(f'{sys.path[0]}/data/enzyme_accession.txt','r') as f:
+    enzyme_accession = [] 
+    with open(os.path.join(data_path, "enzyme_accession.txt"),'r') as f:
         while 1:
             a = f.readline().strip()
             if not a:
@@ -79,7 +82,8 @@ def first_prediction(strgpu, batch_size, seed,
     enzyme_result = pd.DataFrame(enzyme_result)
     enzyme_result_sort = enzyme_result.sort_values(by='First')
     sort_index = enzyme_result.sort_values(by='First').index
-    prompt_data = pd.read_table(data_path, header=None, index_col=None)
+    prompt_data = torch.load(os.path.join(data_path, "enzyme_prompt_first.pt")).to(torch.float32).numpy()
+    prompt_data = pd.DataFrame(prompt_data)
     prompt_data_sort = prompt_data.reindex(sort_index)
     return enzyme_result_sort, prompt_data_sort
 
@@ -129,43 +133,43 @@ def second_prediction(enzyme_result_sort, prompt_data_sort, seed,
             decode_dict = {value: key for key, value in decode_dict.items()}
             all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                     decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                    param_path=f'{sys.path[0]}/model_param/second/1_MLP_BN_LocalLoss.pt' )
+                    param_path=f'{sys.path[0]}/model_param/second/1_MLP_BN_CLoss_epoch76.pt' )
         if n == 2:
             decode_dict = {1:0, 2:1, 3:2, 4:3, 5:4, 6:5, 7:6, 8:7, 0:8}
             decode_dict = {value: key for key, value in decode_dict.items()}
             all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                     decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                    param_path=f'{sys.path[0]}/model_param/second/2_MLP_BN_LocalLoss.pt' )
+                    param_path=f'{sys.path[0]}/model_param/second/2_MLP_BN_CLoss_epoch15.pt' )
         if n == 3:
             decode_dict = {1:0, 2:1, 4:2, 5:3, 6:4, 0:5}
             decode_dict = {value: key for key, value in decode_dict.items()}
             all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                     decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                    param_path=f'{sys.path[0]}/model_param/second/3_MLP_BN_LocalLoss.pt' )
+                    param_path=f'{sys.path[0]}/model_param/second/3_MLP_BN_LocalLoss_epoch12.pt' )
         if n == 4:
             decode_dict = {1:0, 2:1, 3:2, 6:3, 0:4}
             decode_dict = {value: key for key, value in decode_dict.items()}
             all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                     decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                    param_path=f'{sys.path[0]}/model_param/second/4_MLP_BN_LocalLoss.pt' )
+                    param_path=f'{sys.path[0]}/model_param/second/4_MLP_BN_CLoss_epoch38.pt' )
         if n == 5:
             decode_dict = {1:0, 2:1, 3:2, 4:3, 6:4, 0:5}
             decode_dict = {value: key for key, value in decode_dict.items()}
             all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                     decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                    param_path=f'{sys.path[0]}/model_param/second/5_MLP_BN_LocalLoss.pt' )
+                    param_path=f'{sys.path[0]}/model_param/second/5_MLP_BN_CLoss_epoch49.pt' )
         if n == 6:
             decode_dict = {1:0, 2:1, 3:2, 5:3, 0:4}
             decode_dict = {value: key for key, value in decode_dict.items()}
             all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                     decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                    param_path=f'{sys.path[0]}/model_param/second/6_MLP_BN_LocalLoss.pt' )
+                    param_path=f'{sys.path[0]}/model_param/second/6_MLP_BN_CLoss_epoch34.pt' )
         if n == 7:
             decode_dict = {1:0, 2:1, 3:2, 4:3, 6:4, 0:5}
             decode_dict = {value: key for key, value in decode_dict.items()}
             all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                     decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                    param_path=f'{sys.path[0]}/model_param/second/7_MLP_BN_LocalLoss.pt' )
+                    param_path=f'{sys.path[0]}/model_param/second/7_MLP_BN_LocalLoss_epoch24.pt' )
         second_result = np.concatenate((second_result,all_max))
         second_probability = np.concatenate((second_probability,all_prob))
     # Result
@@ -178,11 +182,11 @@ def second_prediction(enzyme_result_sort, prompt_data_sort, seed,
 
 def calculate_knn_score(prompt_data, first, second, mode='third'):
     """Calculate KNN score"""
-    data = pd.read_table(f'{sys.path[0]}/model_param/{mode}/ex_{first}/{first}_{second}_train_embedding.txt', header = None, index_col= None)
+    data = pd.read_table(f'{sys.path[0]}/model_param/{mode}/ex_{first}/{first}_{second}_total_embedding.txt', header = None, index_col= None)
     data = np.array(data)
-    label = pd.read_table(f'{sys.path[0]}/model_param/{mode}/ex_{first}/{first}_{second}_train_label.txt', header = None, index_col= None)
+    label = pd.read_table(f'{sys.path[0]}/model_param/{mode}/ex_{first}/{first}_{second}_total_label.txt', header = None, index_col= None)
     label = np.array(label).flatten()
-    neigh = KNeighborsClassifier(n_neighbors=3, weights='distance')
+    neigh = KNeighborsClassifier(n_neighbors=1) # 做个实验验证一下k=3和k=1哪一个效果最好
     neigh.fit(data, label) 
     pred = neigh.predict(np.array(prompt_data))
     prob = neigh.predict_proba(np.array(prompt_data))
@@ -191,11 +195,11 @@ def calculate_knn_score(prompt_data, first, second, mode='third'):
 
 def calculate_knn_score_fourth(prompt_data, first, second, third, mode='fourth'):
     """Calculate KNN score"""
-    data = pd.read_table(f'{sys.path[0]}/model_param/{mode}/ex_{first}/ex_{first}_{second}/{first}_{second}_{third}_train_embedding.txt', header = None, index_col= None)
+    data = pd.read_table(f'{sys.path[0]}/model_param/{mode}/ex_{first}/ex_{first}_{second}/{first}_{second}_{third}_total_embedding.txt', header = None, index_col= None)
     data = np.array(data)
-    label = pd.read_table(f'{sys.path[0]}/model_param/{mode}/ex_{first}/ex_{first}_{second}/{first}_{second}_{third}_train_label.txt', header = None, index_col= None)
+    label = pd.read_table(f'{sys.path[0]}/model_param/{mode}/ex_{first}/ex_{first}_{second}/{first}_{second}_{third}_total_label.txt', header = None, index_col= None)
     label = np.array(label).flatten()
-    neigh = KNeighborsClassifier(n_neighbors=3, weights='distance')
+    neigh = KNeighborsClassifier(n_neighbors=1) # 做个实验验证一下k=3和k=1哪一个效果最好
     neigh.fit(data, label) 
     pred = neigh.predict(np.array(prompt_data))
     prob = neigh.predict_proba(np.array(prompt_data))
@@ -252,6 +256,10 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
                 all_max, all_prob = calculate_knn_score(prompt_data, first=i, second=n, mode='third')
+            elif n == 8:
+                need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
+                prompt_data = prompt_data_sort2.reindex(need_index)
+                all_max, all_prob = calculate_knn_score(prompt_data, first=i, second=n, mode='third')
             elif n == 10:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
@@ -268,14 +276,6 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
                 all_max, all_prob = calculate_knn_score(prompt_data, first=i, second=n, mode='third')
-            elif n == 8:
-                need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
-                prompt_data = prompt_data_sort2.reindex(need_index)
-                decode_dict = {4:0, 1:1, 0:2}
-                decode_dict = {value: key for key, value in decode_dict.items()}
-                all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
-                decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
             elif n == 14:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
@@ -283,7 +283,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss_epoch37.pt' )
             elif n == 17:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
@@ -291,7 +291,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch21.pt' )
         if i == 2:
             if n == 0:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
@@ -316,7 +316,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch32.pt' )
             elif n == 3:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
@@ -324,7 +324,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch25.pt' )
             elif n == 4:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
@@ -332,15 +332,15 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch44.pt' )
             elif n == 7:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
-                decode_dict = {7:0, 1:1, 11:2, 4:3, 2:4, 8:5, 0:6}
+                decode_dict = {7:0, 1:1, 11:2, 4:3, 2:4, 8:5, 10:6, 0:7}
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch32.pt' )
             elif n == 8:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
@@ -348,7 +348,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch32.pt' )
         if i == 3:
             if n == 0:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
@@ -357,11 +357,11 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
             elif n == 1:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
-                decode_dict = {3:0, 1:1, 26:2, 21:3, 11:4, 4:5, 2:6, 0:7}
+                decode_dict = {1:0, 3:1, 26:2, 21:3, 11:4, 2:5, 4:6, 0:7}
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch64.pt' )
             elif n == 2:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
@@ -369,23 +369,23 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch10.pt' )
             elif n == 4:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
-                decode_dict = {21:0, 24:1, 11:2, 23:3, 19:4, 22:5, 25:6, 0:7}
+                decode_dict = {21:0, 24:1, 11:2, 23:3, 22:4, 19:5, 25:6, 0:7}
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch65.pt' )
             elif n == 5:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
-                decode_dict = {1:0, 4:1, 2:2, 3:3, 0:4}
+                decode_dict = {1:0, 4:1, 2:2, 0:3}
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch60.pt' )
             elif n == 6:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
@@ -393,7 +393,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch43.pt' )
         if i == 4:
             if n == 0:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
@@ -410,7 +410,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch33.pt' )
             elif n == 2:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
@@ -418,7 +418,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch41.pt' )
             elif n == 3:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
@@ -426,7 +426,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch12.pt' )
         if i == 5:
             if n == 0:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
@@ -447,7 +447,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch32.pt' )
             elif n == 4:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
@@ -455,7 +455,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch29.pt' )
             elif n == 6:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
                 prompt_data = prompt_data_sort2.reindex(need_index)
@@ -463,7 +463,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss_epoch16.pt' )
         if i == 6:
             if n == 0:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
@@ -488,7 +488,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_CLoss_epoch55.pt' )
         if i == 7:
             if n == 0:
                 need_index = enzyme_result_sort2[(enzyme_result_sort2['First'] == i) & (enzyme_result_sort2['Second'] == n)].index
@@ -517,7 +517,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
                 decode_dict = {value: key for key, value in decode_dict.items()}
                 all_prob, all_max = prediction(strgpu, batch_size, prompt_data = prompt_data,   
                 decode_dict=decode_dict, n_class=len(decode_dict), seed=2024,
-                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss.pt' )
+                param_path=f'{sys.path[0]}/model_param/third/ex_{i}/{i}_{n}_MLP_BN_LocalLoss_epoch10.pt' )
         third_result = np.concatenate((third_result,all_max))
         third_probability = np.concatenate((third_probability,all_prob))
     # Result
@@ -528,7 +528,7 @@ def third_prediction(enzyme_result_sort2, prompt_data_sort2, seed,
     prompt_data_sort3 = prompt_data_sort2.reindex(sort_index)
     return enzyme_result_sort3, prompt_data_sort3
 
-def fourth_prediction(enzyme_result_sort3, prompt_data_sort3, seed, 
+def fourth_prediction(enzyme_result_sort3, prompt_data_sort3, seed, output, 
                       strgpu, batch_size):
     """Fourth prediction"""
     enzyme_result_sort4 = enzyme_result_sort3[enzyme_result_sort3['Third'].apply(lambda x: isinstance(x, int))]
@@ -553,19 +553,6 @@ def fourth_prediction(enzyme_result_sort3, prompt_data_sort3, seed,
     fourth_probability = np.array([])
     for i, n, m in fir_sec_thi_set:
         if i == 1:
-            if n == 8:
-                if m == 0:
-                    need_index = enzyme_result_sort4[(enzyme_result_sort4['First'] == i) & (enzyme_result_sort4['Second'] == n) & (enzyme_result_sort4['Third'] == m)].index
-                    prompt_data = prompt_data_sort4.reindex(need_index)
-                    all_max, all_prob = calculate_knn_score_fourth(prompt_data, first=i, second=n, third=m, mode='fourth')
-                elif m == 1:
-                    need_index = enzyme_result_sort4[(enzyme_result_sort4['First'] == i) & (enzyme_result_sort4['Second'] == n) & (enzyme_result_sort4['Third'] == m)].index
-                    prompt_data = prompt_data_sort4.reindex(need_index)
-                    all_max, all_prob = calculate_knn_score_fourth(prompt_data, first=i, second=n, third=m, mode='fourth')
-                elif m == 4:
-                    need_index = enzyme_result_sort4[(enzyme_result_sort4['First'] == i) & (enzyme_result_sort4['Second'] == n) & (enzyme_result_sort4['Third'] == m)].index
-                    prompt_data = prompt_data_sort4.reindex(need_index)
-                    all_max, all_prob = calculate_knn_score_fourth(prompt_data, first=i, second=n, third=m, mode='fourth')
             if n == 14:
                 if m == 0:
                     need_index = enzyme_result_sort4[(enzyme_result_sort4['First'] == i) & (enzyme_result_sort4['Second'] == n) & (enzyme_result_sort4['Third'] == m)].index
@@ -665,6 +652,10 @@ def fourth_prediction(enzyme_result_sort3, prompt_data_sort3, seed,
                     need_index = enzyme_result_sort4[(enzyme_result_sort4['First'] == i) & (enzyme_result_sort4['Second'] == n) & (enzyme_result_sort4['Third'] == m)].index
                     prompt_data = prompt_data_sort4.reindex(need_index)
                     all_max, all_prob = calculate_knn_score_fourth(prompt_data, first=i, second=n, third=m, mode='fourth')     
+                elif m == 10:
+                    need_index = enzyme_result_sort4[(enzyme_result_sort4['First'] == i) & (enzyme_result_sort4['Second'] == n) & (enzyme_result_sort4['Third'] == m)].index
+                    prompt_data = prompt_data_sort4.reindex(need_index)
+                    all_max, all_prob = calculate_knn_score_fourth(prompt_data, first=i, second=n, third=m, mode='fourth')  
                 elif m == 11:
                     need_index = enzyme_result_sort4[(enzyme_result_sort4['First'] == i) & (enzyme_result_sort4['Second'] == n) & (enzyme_result_sort4['Third'] == m)].index
                     prompt_data = prompt_data_sort4.reindex(need_index)
@@ -768,10 +759,6 @@ def fourth_prediction(enzyme_result_sort3, prompt_data_sort3, seed,
                     prompt_data = prompt_data_sort4.reindex(need_index)
                     all_max, all_prob = calculate_knn_score_fourth(prompt_data, first=i, second=n, third=m, mode='fourth')
                 elif m == 2:
-                    need_index = enzyme_result_sort4[(enzyme_result_sort4['First'] == i) & (enzyme_result_sort4['Second'] == n) & (enzyme_result_sort4['Third'] == m)].index
-                    prompt_data = prompt_data_sort4.reindex(need_index)
-                    all_max, all_prob = calculate_knn_score_fourth(prompt_data, first=i, second=n, third=m, mode='fourth')
-                elif m == 3:
                     need_index = enzyme_result_sort4[(enzyme_result_sort4['First'] == i) & (enzyme_result_sort4['Second'] == n) & (enzyme_result_sort4['Third'] == m)].index
                     prompt_data = prompt_data_sort4.reindex(need_index)
                     all_max, all_prob = calculate_knn_score_fourth(prompt_data, first=i, second=n, third=m, mode='fourth')
@@ -923,6 +910,8 @@ def fourth_prediction(enzyme_result_sort3, prompt_data_sort3, seed,
         fourth_result = np.concatenate((fourth_result,all_max))
         fourth_probability = np.concatenate((fourth_probability,all_prob))
     # Result
+    enzyme_result_sort4 = enzyme_result_sort4.copy()
+    enzyme_result_sort5 = enzyme_result_sort5.copy()
     enzyme_result_sort4['Fourth'] = list(fourth_result)
     enzyme_result_sort4['FourthProbability'] = list(fourth_probability)
     enzyme_result_sort5['Fourth'] = 0  
@@ -934,19 +923,22 @@ def fourth_prediction(enzyme_result_sort3, prompt_data_sort3, seed,
         matched_values = [value for value in row if isinstance(value, str) and pattern.match(value)]
         result.append(matched_values[0])
     enzyme_result_fourth['FinalResult'] = result
-    enzyme_result_fourth.to_csv(f"{sys.path[0]}/result/enzyme_result.csv", index=False)
+    enzyme_result_fourth.to_csv(os.path.join(output, "enzyme_result.csv"), index=False)
+
+
 
 def main():
-    strgpu, batch_size = argument()
-    seed=2024
-    enzyme_result_sort, prompt_data_sort = first_prediction(strgpu, batch_size, seed, data_path=f'{sys.path[0]}/data/enzyme_prompt_first.txt', 
-                param_path=f'{sys.path[0]}/model_param/first/ft3_MLP_BN_save.pt')
-    enzyme_result_sort2, prompt_data_sort2 = second_prediction(enzyme_result_sort, prompt_data_sort, seed, 
-                      strgpu, batch_size)
-    enzyme_result_sort3, prompt_data_sort3 = third_prediction(enzyme_result_sort2, prompt_data_sort2, seed, 
-                      strgpu, batch_size)
-    fourth_prediction(enzyme_result_sort3, prompt_data_sort3, seed, 
-                      strgpu, batch_size)
-
+    strgpu, batch_size, data_path, output = argument()
+    enzyme_result_sort, prompt_data_sort = first_prediction(
+                strgpu=strgpu, batch_size=batch_size, seed=2024, data_path=data_path, output=output, 
+                param_path=f'{sys.path[0]}/model_param/first/ft5_MLP_BN_epoch5.pt')
+    enzyme_result_sort2, prompt_data_sort2 = second_prediction(
+                      enzyme_result_sort=enzyme_result_sort, prompt_data_sort=prompt_data_sort, seed=2024, 
+                      strgpu=strgpu, batch_size=batch_size)
+    enzyme_result_sort3, prompt_data_sort3 = third_prediction(
+                      enzyme_result_sort2=enzyme_result_sort2, prompt_data_sort2=prompt_data_sort2, seed=2024, 
+                      strgpu=strgpu, batch_size=batch_size)    
+    fourth_prediction(enzyme_result_sort3=enzyme_result_sort3, prompt_data_sort3=prompt_data_sort3, seed=2024,  
+                      output=output, strgpu=strgpu, batch_size=batch_size)
 if __name__ == '__main__':
     main()

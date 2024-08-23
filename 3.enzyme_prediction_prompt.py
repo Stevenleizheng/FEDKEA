@@ -13,20 +13,24 @@ from utilis import EnzymeData, set_cuda
 
 def argument():
     parser = argparse.ArgumentParser(description='Binary task prediction')
-    parser.add_argument('-g', '--gpu', type=str, help="the number of GPU,(eg. '1')")
-    parser.add_argument('-b', '--batch_size', type=int, help='batch size,(eg. 32)')
+    parser.add_argument('-g', '--gpu', type=str, default='None', help="the number of GPU,(eg. '1')")
+    parser.add_argument('-b', '--batch_size', type=int, default=32, help='batch size,(eg. 32)')
+    parser.add_argument('-d', '--data_path', type=str, default=os.path.join(os.getcwd(), 'data/'), help='data file path')
+    parser.add_argument('-o', '--output', type=str, default=os.path.join(os.getcwd(), 'result/'), help='output,(eg. result)')
     args = parser.parse_args()
     strgpu = args.gpu
     batch_size = args.batch_size
-    return strgpu, batch_size
+    data_path = args.data_path
+    output = args.output
+    return strgpu, batch_size, data_path, output
 
-def prompt(strgpu, data_path, batch_size, 
+def prompt(strgpu, data_path, batch_size, output, 
                param_path, seed=2024):
     """Prompt"""
     # Device
     device = set_cuda(strgpu, seed)
     # Dataloader
-    dataset = EnzymeData(data_path)
+    dataset = EnzymeData(os.path.join(data_path, "enzyme_token.pt"))
     dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=False)
     # Model
     ESMenzyme = EsmEnzymeFirst(n_class=7).to(device)
@@ -42,18 +46,18 @@ def prompt(strgpu, data_path, batch_size,
     else:
         ESMenzyme.load_state_dict(torch.load(param_path, map_location=device))
     # Prompt
-    prompt = pd.DataFrame(data=None, columns=range(1280))
+    prompt = torch.empty((0,1280))
     with torch.no_grad():
         ESMenzyme.eval()
         for data, _ in dataloader:
             data = data.to(device)
-            pro = pd.DataFrame(ESMenzyme(data)[0].cpu().detach().numpy(), columns=range(1280))
-            prompt = pd.concat([prompt,pro])
-        prompt.to_csv(f"{sys.path[0]}/data/enzyme_prompt_first.txt", sep='\t', header=False, index=False)
-def main():
+            tmp = ESMenzyme(data)[0].cpu()
+            prompt = torch.cat((prompt, tmp), dim=0)
+        torch.save(prompt.clone(), os.path.join(data_path, "enzyme_prompt_first.pt"))
+def main():  
     """Main program running!"""
-    strgpu, batch_size = argument()
-    prompt(strgpu=strgpu, data_path=f'{sys.path[0]}/data/enzyme_token.txt', batch_size=batch_size, 
-                param_path=f'{sys.path[0]}/model_param/first/ft3_MLP_BN_save.pt', seed=2024)
+    strgpu, batch_size, data_path, output = argument()
+    prompt(strgpu=strgpu, data_path=data_path, batch_size=batch_size, output=output,
+                param_path=f'{sys.path[0]}/model_param/first/ft5_MLP_BN_epoch5.pt', seed=2024)
 if __name__ == '__main__':
     main()

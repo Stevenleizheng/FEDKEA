@@ -12,16 +12,15 @@ class EnzymeData(Dataset):
     def __init__(self, data_path):
         """Initialization"""
         super(EnzymeData, self).__init__()    
-        self.x = np.array(pd.read_table(data_path, header=None, index_col=None))
-
+        self.x = torch.load(data_path)
     def __len__(self):
         """Number of samples"""
         return len(self.x)
 
     def __getitem__(self, idx):
         """Load data in batches"""
-        x_long = torch.tensor(self.x[idx], dtype=torch.long)
-        x_float = torch.tensor(self.x[idx], dtype=torch.float32)
+        x_long = self.x[idx].to(torch.long)
+        x_float = self.x[idx].to(torch.float32)
         return x_long, x_float
 
 class EnzData(Dataset):
@@ -67,7 +66,7 @@ class Timer:
 def set_cuda(strgpu, seed = 2024):
     """GPUs and random number seeds"""
     if strgpu is not None:
-        os.environ['CUDA_VISIBLE_DEVICES'] = strgpu
+        os.environ['CUDA_VISIBLE_DEVICES'] = strgpu # 超算运行需要注释掉
         device=torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     else:
         device = 'cpu'
