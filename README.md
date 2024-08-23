@@ -48,20 +48,20 @@ f. scikit-learn: ``pip install scikit-learn==1.2.0``
 
 ``tar xzvf model_param.tar.gz``
 
-(Optional) Step 3: test the software
+### (Optional) Step 3: test the software
 Run this command (a test prediction with 415 proteins) to see whether the software has installed correctly.
 
 ``python main.py -i Testset/data/UniProt_202402_IsEnzyme.fasta ``
 
 If the software is installed correctly and completely, this step will finish in less than 10 minutes (might be longer if your device is too old) without any error. The results of the test prediction will be saved in the result folder.
 
-Step 4: prediction
-(1) Preparations
+### Step 4: prediction
+#### (1) Preparations
 Your proteins in a fasta file (path: ???.fa).
 A directory to save the output files (path: ???/).
 If you want to use GPU(s), please prepare the IDs of the GPU(s) you want to use, for example, a single-GPU machine, here it is prepared to be 0; multi-GPU machine using only one GPU, here it is prepared as x (x is the GPU ID used); multi-GPU machine using multiple GPUs, here it is prepared as x1,x2,... (x1,x2,... are the GPU IDs you want to use).
 
-(2) Prediction
+#### (2) Prediction
 
 CPU: ``python main.py -i ???.fa ``
 
