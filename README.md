@@ -40,9 +40,9 @@ e. numpy: ``conda install numpy=1.26.2`` or ``pip install numpy==1.22.3``
 f. scikit-learn: ``pip install scikit-learn==1.2.0``
 
 ### Step 2: download the trained model
-(1) Download the model (The working path is still 'FEDKEA'). The file size is 5.2 GB.
+(1) Download the model (The working path is still 'FEDKEA'). The file size is 5.8 GB.
 
-``wget -c https://zenodo.org/records/13119729/files/model_param.tar.gz``
+``wget -c https://zenodo.org/records/13364055/files/model_param.tar.gz``
 
 (2) Unpack the file
 
@@ -89,4 +89,4 @@ multi GPU machine, using eight GPUs (ID:0-7): ``python main.py -i example.fa -g 
 
 The descriptions for the result files are in the 'binary_result.txt' and 'enzyme_result.csv' files of the output directory.
 
-Additionally, our tool provides two parameters: one is -a, which, if processing FASTA files with sequences ending in *, can be set to 1 (default is 0). The other parameter is -t, which controls the threshold for binary classification models (ranging from 0 to 1). A higher value increases the confidence in the selected enzymes, while a lower value allows for the detection of more enzymes, but may also result in a higher rate of false positives. If the sequences are known to be enzymes, the parameter -t can be set to 0.
+Additionally, our tool provides two parameters: one is -a, which, if processing FASTA files with sequences ending in *, can be set to 1 (default is 0). The other parameter is -t, which controls the threshold for binary classification models (ranging from 0 to 1, default is 0.5). A higher value increases the confidence in the selected enzymes, while a lower value allows for the detection of more enzymes, but may also result in a higher rate of false positives. If the sequences are known to be enzymes, the parameter -t can be set to 0.
