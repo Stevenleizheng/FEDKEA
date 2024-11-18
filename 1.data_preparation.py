@@ -26,7 +26,7 @@ def format_transfer(fasta_path, data_path):
     records = SeqIO.parse(fasta_path, "fasta")
     for record in records:
         record_id.append(record.id)
-        data.append((record.id, record.seq))
+        data.append((str(record.id), str(record.seq)))
     os.makedirs(data_path, exist_ok = True)  
     with open(os.path.join(data_path, "accession.txt"), 'w') as fw:
         for i, _ in data:
