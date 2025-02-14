@@ -40,7 +40,7 @@ e. numpy: ``conda install numpy=1.26.2`` or ``pip install numpy==1.22.3``
 f. scikit-learn: ``pip install scikit-learn==1.2.0``
 
 ### Step 2: download the trained model
-(1) Download the model (The working path is still 'FEDKEA'). The model parameter file is saved at: https://zenodo.org/records/13364055. The file size is 5.8 GB.
+(1) Download the model (The working path is still 'FEDKEA'). The model parameter file is saved at: https://zenodo.org/records/13364055. The file size is 5.6 GB.
 
 ``wget -c https://zenodo.org/records/14868763/files/model_param.tar.gz``
 
