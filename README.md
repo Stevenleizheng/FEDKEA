@@ -2,7 +2,7 @@
 ## Description
 A deep learning model for the enzyme annotation of proteins.
 Two levels of annotation:
-(1) Binary: enzyme or non-enzyme
+(1) Enzyme identification: enzyme or non-enzyme
 (2) EC number prediction if one protein is an enzyme
 ## Steps to predict
 ### Step 1: prepare the environment
@@ -50,18 +50,18 @@ or
 
 (2) Unpack the file
 
-``tar xzvf model_param.tar.gz``
+``tar -xzvf model_param.tar.gz``
 
 ### (Optional) Step 3: test the software
 Run this command (a test prediction with 415 proteins) to see whether the software has installed correctly using CPU.
 
-``python main.py -i Testset/data/UniProt_202402_IsEnzyme.fasta``
+``python main.py -i Testset/data/UniProt_202402_IsEnzyme.fasta -b 32``
 
 If the software is installed correctly and completely, this step will finish in less than 10 minutes (might be longer if your device is too low) without any error. The results of the test prediction will be saved in the result folder.
 
 Run this command (a test prediction with 415 proteins) to see whether the software has installed correctly using GPU (e.g. NVIDIA A40).
 
-``python main.py -i Testset/data/UniProt_202402_IsEnzyme.fasta -g 0``
+``python main.py -i Testset/data/UniProt_202402_IsEnzyme.fasta -g 0 -b 32``
 
 If the software is installed correctly and completely, this step will finish in less than 3 minutes (might be longer if your device is too old) without any error. The results of the test prediction will be saved in the result folder.
 
@@ -83,7 +83,7 @@ multi GPU machine, using multi GPUs: ``python main.py -i ???.fa -g 'x1,x2,...'``
 
 -o determines the output directory, -g determines the IDs of GPUs you want to use (not given -g, will use CPU)
 
-If you want to change the batch size (default is 32), please use -b, please note that the batch size cannot be negative and should not be smaller than the number of GPUs used.
+If you want to change the batch size (default is 1), please use -b, please note that the batch size cannot be negative and should not be smaller than the number of GPUs used.
 
 If you want to change the threshold of binary task (default is 0.5), please use -t. You can set the number between 0 and 1.
 Example commands:
@@ -100,6 +100,16 @@ multi GPU machine, using eight GPUs (ID:0-7): ``python main.py -i example.fa -g 
 
 The descriptions for the result files are in the 'binary_result.txt' and 'enzyme_result.csv' files of the output directory.
 
-Additionally, our tool provides two parameters: one is -a, which, if processing FASTA files with sequences ending in *, can be set to 1 (default is 0). 
+Additionally, our tool provides two parameters: one is -r, which controls the running mode. If -r is 1, it means enzyme identification and EC number prediction, and if -r is 2, it means only EC number prediction, not enzyme identification.
 
 The other parameter is -t, which controls the threshold for binary classification models (ranging from 0 to 1, default is 0.5). A higher value increases the confidence in the selected enzymes, while a lower value allows for the detection of more enzymes, but may also result in a higher rate of false positives. If the sequences are known to be enzymes, the parameter -t can be set to 0.
+
+### Step 5: result intepretation
+The results will be saved in the output directory you specified. The results include: binary_result.txt, enzyme_result_with_probability.csv and enzyme_result_with_confidence.csv. 
+Here's what each file contains:
+- **binary_result.txt**: Contains binary classification results (enzyme/non-enzyme) with corresponding probabilities
+- **enzyme_result_with_probability.csv**: Records EC number predictions with hierarchical probabilities. When KNN model is used at any prediction level, this will directly output the complete EC number with probabilities set to 1, indicating the nearest EC neighbor's result is selected as the final prediction.
+- **enzyme_result_with_confidence.csv**: Provides predicted EC numbers with confidence levels:
+  - *High confidence*: When all hierarchical prediction probabilities exceed the threshold
+  - *Low confidence*: When the first-level prediction probability falls below the threshold
+  - *Medium confidence*: All other cases between high and low confidence thresholds
