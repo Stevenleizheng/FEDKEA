@@ -705,7 +705,7 @@ def fourth_prediction(enzyme_result_sort3, prompt_data_sort3, seed, output,
         batch_size: Batch size parameter (unused in KNN implementation)
     
     Returns:
-        None: Saves final results to enzyme_result.csv in output directory
+        None: Saves final results to enzyme_result_with_probability.csv in output directory
     """
     # Split data based on third-level prediction type (int vs string)
     enzyme_result_sort4 = enzyme_result_sort3[enzyme_result_sort3['Third'].apply(lambda x: isinstance(x, int))]
@@ -1104,7 +1104,7 @@ def fourth_prediction(enzyme_result_sort3, prompt_data_sort3, seed, output,
         matched_values = [value for value in row if isinstance(value, str) and pattern.match(value)]
         result.append(matched_values[0])
     enzyme_result_fourth['FinalResult'] = result
-    enzyme_result_fourth.to_csv(os.path.join(output, "enzyme_result.csv"), index=False)
+    enzyme_result_fourth.to_csv(os.path.join(output, "enzyme_result_with_probability.csv"), index=False)
 
 
 
