@@ -38,7 +38,7 @@ def main():
     """
     output = argument()
     lines = []
-    with open(os.path.join(output, 'enzyme_result.csv'), "r") as f:
+    with open(os.path.join(output, 'enzyme_result_with_probability.csv'), "r") as f:
         while True:
             line = f.readline()
             if not line:
@@ -500,7 +500,7 @@ def main():
             if float(data[2]) <= first_threshold[7]:
                 low_confidence_names.append(data[0])
     # Annotate and save results
-    result = pd.read_csv(os.path.join(output, 'enzyme_result.csv'))
+    result = pd.read_csv(os.path.join(output, 'enzyme_result_with_probability.csv'))
     result['confidence'] = 'Medium'
     result.loc[result['Accession'].isin(names), 'confidence'] = 'High'
     result.loc[result['Accession'].isin(low_confidence_names), 'confidence'] = 'Low'
