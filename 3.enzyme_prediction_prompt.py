@@ -80,6 +80,7 @@ def prompt(strgpu, data_path, batch_size, output,
     else:
         ESMenzyme.load_state_dict(torch.load(param_path, map_location=device))
     # Prompt
+    os.makedirs(output, exist_ok = True)
     prompt = torch.empty((0,1280))
     with torch.no_grad():
         ESMenzyme.eval()
