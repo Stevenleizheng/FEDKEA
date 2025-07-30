@@ -1,4 +1,7 @@
 # FEDKEA: Enzyme Function Prediction using Fine-tuning ESM2 and Distance-based KNN
+
+FEDKEA has been developed into a user-friendly web server, freely accessible at https://www.viromelab.com/software/fedkea.
+
 ## Description
 A deep learning model for the enzyme annotation of proteins.
 Two levels of annotation:
