@@ -56,17 +56,17 @@ or
 ``tar -xzvf model_param.tar.gz``
 
 ### (Optional) Step 3: test the software
-Run this command (a test prediction with 415 proteins) to see whether the software has installed correctly using CPU.
+Run this command (a test prediction with 2877 proteins) to see whether the software has installed correctly using CPU.
 
-``python main.py -i Testset/data/UniProt_202402_IsEnzyme.fasta -b 32``
+``python main.py -i Testset/data/UniProt_202505_IsEnzyme.fasta -b 32``
 
-If the software is installed correctly and completely, this step will finish in less than 10 minutes (might be longer if your device is too low) without any error. The results of the test prediction will be saved in the result folder.
+If the software is installed correctly and completely, this step will finish in less than 30 minutes (might be longer if your device is too low) without any error. The results of the test prediction will be saved in the result folder.
 
-Run this command (a test prediction with 415 proteins) to see whether the software has installed correctly using GPU (e.g. NVIDIA A40).
+Run this command (a test prediction with 2877 proteins) to see whether the software has installed correctly using GPU (e.g. NVIDIA A40).
 
-``python main.py -i Testset/data/UniProt_202402_IsEnzyme.fasta -g 0 -b 32``
+``python main.py -i Testset/data/UniProt_202505_IsEnzyme.fasta -g 0 -b 32``
 
-If the software is installed correctly and completely, this step will finish in less than 3 minutes (might be longer if your device is too old) without any error. The results of the test prediction will be saved in the result folder.
+If the software is installed correctly and completely, this step will finish in less than 5 minutes (might be longer if your device is too old) without any error. The results of the test prediction will be saved in the result folder.
 
 ### Step 4: prediction
 #### (1) Preparations
