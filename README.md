@@ -28,19 +28,17 @@ Two levels of annotation:
 (5) Install the following software
 
 a. pytorch:
-If you want to use the CPU version, please run conda install pytorch torchvision torchaudio cpuonly -c pytorch.
+If you want to use the CPU version, please run ``conda install pytorch torchvision torchaudio cpuonly -c pytorch`` or ``pip install torch torchvision torchaudio``.
 
 If you want to use the GPU version, please go to https://pytorch.org/get-started and get the conda or pip install command according to your device and demand.
 
-b. fair-esm: ``pip install fair-esm==2.0.0``
+b. fair-esm: ``pip install fair-esm``
 
-c. pandas: ``pip install pandas==1.4.2``
+c. pandas: ``conda install -c bioconda pandas`` or ``pip install pandas``
 
-d. biopython: ``conda install -c bioconda biopython=1.78``
+d. biopython: ``conda install -c bioconda biopython``
 
-e. numpy: ``conda install numpy=1.26.2`` or ``pip install numpy==1.22.3``
-
-f. scikit-learn: ``pip install scikit-learn==1.2.0``
+e. scikit-learn: ``pip install scikit-learn``
 
 ### Step 2: Download the trained model
 (1) Download the model (The working path is still 'FEDKEA'). The model parameter file is saved at: https://zenodo.org/records/14868763. The file size is 5.6 GB.
