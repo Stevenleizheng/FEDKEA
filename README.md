@@ -28,9 +28,9 @@ Two levels of annotation:
 (5) Install the following software
 
 a. pytorch:
-If you want to use the CPU version, please run ``conda install pytorch torchvision torchaudio cpuonly -c pytorch`` or ``pip install torch torchvision torchaudio``.
+If you want to use the CPU version, please go to https://pytorch.org/get-started and get the pip install command or run ``pip3 install torch torchvision --index-url https://download.pytorch.org/whl/cpu``
 
-If you want to use the GPU version, please go to https://pytorch.org/get-started and get the conda or pip install command according to your device and demand.
+If you want to use the GPU version, please go to https://pytorch.org/get-started and get the pip install command according to your device and demand.
 
 b. fair-esm: ``pip install fair-esm``
 
