@@ -19,7 +19,7 @@ Two levels of annotation:
 
 (3) Create a new conda environment, for example:
 
-``conda create -n fedkea python=3.9.18``
+``conda create -n fedkea python=3.9``
 
 (4) Enter the conda environment
 
