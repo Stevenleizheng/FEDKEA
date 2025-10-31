@@ -7,8 +7,8 @@ from utilis import Timer
 def argument():
     parser = argparse.ArgumentParser(description='Enzyme Commission Prediction Pipeline')
     parser.add_argument('-i', '--fasta_data', type=str, help='fasta file path')
-    parser.add_argument('-g', '--gpu', type=str, default='None', help="the number of GPU,(eg. '1')")
-    parser.add_argument('-b', '--batch_size', type=int, default=1, help='batch size,(eg. 1)')
+    parser.add_argument('-g', '--gpu', type=str, default='None', help="the number of GPU,(eg. '0')")
+    parser.add_argument('-b', '--batch_size', type=int, default=2, help='batch size,(eg. 2)')
     parser.add_argument('-t', '--threshold', type=float, default=0.5, help='threshold,(eg. 0.5)')
     parser.add_argument('-d', '--data_path', type=str, default=os.path.join(os.getcwd(), 'data/'), help='data file path')
     parser.add_argument('-o', '--output', type=str, default=os.path.join(os.getcwd(), 'result/'), help='output,(eg. result)')
