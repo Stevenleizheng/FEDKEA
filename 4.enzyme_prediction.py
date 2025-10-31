@@ -25,7 +25,7 @@ def argument():
     """
     parser = argparse.ArgumentParser(description='Enzyme commission prediction')
     parser.add_argument('-g', '--gpu', type=str, default='None', help="the number of GPU,(eg. '1')")
-    parser.add_argument('-b', '--batch_size', type=int, default=1, help='batch size,(eg. 1)')
+    parser.add_argument('-b', '--batch_size', type=int, default=2, help='batch size,(eg. 2)')
     parser.add_argument('-d', '--data_path', type=str, default=os.path.join(os.getcwd(), 'data/'), help='data file path')
     parser.add_argument('-o', '--output', type=str, default=os.path.join(os.getcwd(), 'result/'), help='output,(eg. result)')
     args = parser.parse_args()
